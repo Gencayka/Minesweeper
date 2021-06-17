@@ -1,35 +1,40 @@
 package ru.chayka.minesweeper.view;
 
-import ru.chayka.minesweeper.view.aboutFrame.AboutFrame;
-import ru.chayka.minesweeper.view.compositeClasses.ViewComposite;
+import ru.chayka.minesweeper.view.aboutframe.AboutFrame;
 import ru.chayka.minesweeper.view.leaderboard.LeaderboardFrame;
 import ru.chayka.minesweeper.view.leaderboard.RecordNewLeaderFrame;
-import ru.chayka.minesweeper.view.minesweeperFrame.MinesweeperFrame;
+import ru.chayka.minesweeper.view.mainframe.MainFrame;
 
 public class MinesweeperView {
-    private final ViewComposite viewComposite;
-    private final MinesweeperFrame mainFrame;
+    private final MainFrame mainFrame;
+    private final LeaderboardFrame leaderboardFrame;
+    private final RecordNewLeaderFrame recordNewLeaderFrame;
+    private final AboutFrame aboutFrame;
 
     public MinesweeperView() {
-        viewComposite = new ViewComposite(this);
-        mainFrame = new MinesweeperFrame();
-        viewComposite.addViewComponent(mainFrame.getViewComponent());
+        mainFrame = new MainFrame();
+        leaderboardFrame = new LeaderboardFrame(mainFrame.getJFrame());
+        recordNewLeaderFrame = new RecordNewLeaderFrame(mainFrame.getJFrame());
+        aboutFrame = new AboutFrame(mainFrame.getJFrame());
+    }
 
-        LeaderboardFrame leaderboardFrame = new LeaderboardFrame(mainFrame.getJFrame());
-        viewComposite.addViewComponent(leaderboardFrame.getViewComponent());
+    public MainFrame getMainFrame() {
+        return mainFrame;
+    }
 
-        RecordNewLeaderFrame recordNewLeaderFrame = new RecordNewLeaderFrame(mainFrame.getJFrame());
-        viewComposite.addViewComponent(recordNewLeaderFrame.getViewComponent());
+    public LeaderboardFrame getLeaderboardFrame() {
+        return leaderboardFrame;
+    }
 
-        AboutFrame aboutFrame = new AboutFrame(mainFrame.getJFrame());
-        viewComposite.addViewComponent(aboutFrame.getViewComponent());
+    public RecordNewLeaderFrame getRecordNewLeaderFrame() {
+        return recordNewLeaderFrame;
+    }
+
+    public AboutFrame getAboutFrame() {
+        return aboutFrame;
     }
 
     public void showMainFrame() {
         mainFrame.getJFrame().setVisible(true);
-    }
-
-    public ViewComposite getViewComponent() {
-        return viewComposite;
     }
 }

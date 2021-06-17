@@ -2,24 +2,21 @@ package ru.chayka.minesweeper.model.minefield;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.chayka.minesweeper.eventsystem.events.model.FlagCounterDtoEvent;
+import ru.chayka.minesweeper.eventsystem.senders.model.FlagCounterDtoEventSender;
 import ru.chayka.minesweeper.model.DifficultyMode;
-import ru.chayka.minesweeper.model.MVCLogger;
-import ru.chayka.minesweeper.observerInterfaces.observables.model.FlagCounterObservable;
-import ru.chayka.minesweeper.observerInterfaces.observers.view.FlagCounterObserver;
 
-import java.util.ArrayList;
-
-public class FlagCounter
-        implements FlagCounterObservable {
+public class FlagCounter {
     private static final Logger log = LoggerFactory.getLogger(FlagCounter.class.getName());
-
-    private final ArrayList<FlagCounterObserver> observers;
 
     private int numOfRemainingMines;
 
+    private final FlagCounterDtoEventSender flagCounterDtoEventSender;
+
     public FlagCounter() {
-        observers = new ArrayList<>();
         numOfRemainingMines = 0;
+
+        flagCounterDtoEventSender = new FlagCounterDtoEventSender();
     }
 
     public void setNumOfRemainingMines(DifficultyMode difficultyMode) {
@@ -28,42 +25,23 @@ public class FlagCounter
 
     public void setNumOfRemainingMines(int numOfRemainingMines) {
         this.numOfRemainingMines = numOfRemainingMines;
-        notifyObservers();
+        flagCounterDtoEventSender.notifyAllListeners(
+                new FlagCounterDtoEvent(numOfRemainingMines));
+    }
+
+    public FlagCounterDtoEventSender getFlagCounterDtoEventSender() {
+        return flagCounterDtoEventSender;
     }
 
     public void increaseNumOfMines() {
         log.debug("Flag counter increased");
-        numOfRemainingMines++;
-        notifyObservers();
+        flagCounterDtoEventSender.notifyAllListeners(
+                new FlagCounterDtoEvent(++numOfRemainingMines));
     }
 
     public void decreaseNumOfMines() {
         log.debug("Flag counter decreased");
-        numOfRemainingMines--;
-        notifyObservers();
-    }
-
-    @Override
-    public void registerObserver(FlagCounterObserver observer) {
-        if (!observers.contains(observer)) {
-            observers.add(observer);
-            MVCLogger.logObserverRegistration(log, this, observer);
-        }
-    }
-
-    @Override
-    public void removeObserver(FlagCounterObserver observer) {
-        if (observers.contains(observer)) {
-            observers.remove(observer);
-            MVCLogger.logObserverRemoving(log, this, observer);
-        }
-    }
-
-    @Override
-    public void notifyObservers() {
-        for (var observer : observers) {
-            MVCLogger.logObserversNotification(log, this, observer);
-            observer.update(numOfRemainingMines);
-        }
+        flagCounterDtoEventSender.notifyAllListeners(
+                new FlagCounterDtoEvent(--numOfRemainingMines));
     }
 }

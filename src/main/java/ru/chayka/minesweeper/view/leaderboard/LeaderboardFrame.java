@@ -1,22 +1,26 @@
 package ru.chayka.minesweeper.view.leaderboard;
 
-import ru.chayka.minesweeper.dto.LeaderboardDto;
-import ru.chayka.minesweeper.observerInterfaces.observers.view.LeaderboardObserver;
-import ru.chayka.minesweeper.view.compositeClasses.ViewComposite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.chayka.minesweeper.eventsystem.EventSystemLogger;
+import ru.chayka.minesweeper.eventsystem.events.model.LeaderboardDtoEvent;
+import ru.chayka.minesweeper.eventsystem.listeners.view.LeaderboardDtoEventListener;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class LeaderboardFrame
-        implements LeaderboardObserver {
-    private final ViewComposite viewComposite;
+        implements LeaderboardDtoEventListener {
+    private static final Logger log = LoggerFactory.getLogger(LeaderboardFrame.class.getName());
+
     private final JDialog jDialog;
 
-    private final LeaderboardPanel leaderboardPanel;
     private final JFrame mainFrame;
 
+    private final LeaderboardPanel leaderboardPanel;
+    private final ResetResultsButton resetResultsButton;
+
     public LeaderboardFrame(JFrame mainFrame) {
-        viewComposite = new ViewComposite(this);
         jDialog = new JDialog();
 
         this.mainFrame = mainFrame;
@@ -29,8 +33,7 @@ public class LeaderboardFrame
         leaderboardPanel = new LeaderboardPanel();
         jDialog.add(leaderboardPanel.getJPanel(), gridBagConstraints);
 
-        ResetResultsButton resetResultsButton = new ResetResultsButton();
-        viewComposite.addViewComponent(resetResultsButton.getViewComponent());
+        resetResultsButton = new ResetResultsButton();
 
         JButton okButton = new JButton("Ok");
         okButton.setFocusable(false);
@@ -46,13 +49,22 @@ public class LeaderboardFrame
         jDialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
     }
 
-    public ViewComposite getViewComponent() {
-        return viewComposite;
+    public LeaderboardPanel getLeaderboardPanel() {
+        return leaderboardPanel;
+    }
+
+    public ResetResultsButton getResetResultsButton() {
+        return resetResultsButton;
     }
 
     @Override
-    public void acceptLeaderboardDto(LeaderboardDto leaderboardDto) {
-        leaderboardPanel.updateLeaderboard(leaderboardDto.getStrDifficultyModes(), leaderboardDto.getTimes(), leaderboardDto.getLeaderNames());
+    public void acceptEvent(LeaderboardDtoEvent event) {
+        EventSystemLogger.logEventAccepting(log, this, event);
+
+        leaderboardPanel.updateLeaderboard(
+                event.getStrDifficultyModes(),
+                event.getTimes(),
+                event.getLeaderNames());
         if (!jDialog.isVisible()) {
             jDialog.setLocationRelativeTo(mainFrame);
             jDialog.setVisible(true);

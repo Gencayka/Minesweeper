@@ -1,27 +1,20 @@
 package ru.chayka.minesweeper.model.minefield;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.chayka.minesweeper.dto.MinefieldCellDto;
-import ru.chayka.minesweeper.model.MVCLogger;
+import ru.chayka.minesweeper.eventsystem.events.model.GameOverEvent;
+import ru.chayka.minesweeper.eventsystem.events.model.MinefieldCellDtoEvent;
+import ru.chayka.minesweeper.eventsystem.senders.model.GameOverEventSender;
+import ru.chayka.minesweeper.eventsystem.senders.model.MinefieldCellDtoEventSender;
 import ru.chayka.minesweeper.model.leaderboard.Leaderboard;
 import ru.chayka.minesweeper.model.timer.GameTimer;
-import ru.chayka.minesweeper.observerInterfaces.observables.model.MinefieldActionPerformerObservable;
-import ru.chayka.minesweeper.observerInterfaces.observers.view.MinefieldActionPerformerObserver;
 
-import java.util.ArrayList;
-
-public class MinefieldActionPerformer
-        implements MinefieldActionPerformerObservable {
-    private static final Logger log = LoggerFactory.getLogger(MinefieldActionPerformer.class.getName());
-
-    private final ArrayList<MinefieldActionPerformerObserver> observers;
-    private final GameOverNotificator gameOverNotificator;
-
+public class MinefieldActionPerformer {
     private Minefield minefield;
     private final GameTimer gameTimer;
     private final FlagCounter flagCounter;
     private final Leaderboard leaderboard;
+
+    private final MinefieldCellDtoEventSender minefieldCellDtoEventSender;
+    private final GameOverEventSender gameOverEventSender;
 
     public MinefieldActionPerformer(GameTimer gameTimer,
                                     FlagCounter flagCounter,
@@ -30,16 +23,20 @@ public class MinefieldActionPerformer
         this.flagCounter = flagCounter;
         this.leaderboard = leaderboard;
 
-        observers = new ArrayList<>();
-        gameOverNotificator = new GameOverNotificator();
-    }
-
-    public GameOverNotificator getGameOverNotificator() {
-        return gameOverNotificator;
+        minefieldCellDtoEventSender = new MinefieldCellDtoEventSender();
+        gameOverEventSender = new GameOverEventSender();
     }
 
     public void setMinefield(Minefield minefield) {
         this.minefield = minefield;
+    }
+
+    public MinefieldCellDtoEventSender getMinefieldCellDtoEventSender() {
+        return minefieldCellDtoEventSender;
+    }
+
+    public GameOverEventSender getGameOverEventSender() {
+        return gameOverEventSender;
     }
 
     public void openTheCell(MinefieldCell fieldCell) {
@@ -53,7 +50,8 @@ public class MinefieldActionPerformer
             loseTheGame(fieldCell);
         } else {
             fieldCell.setOpened(true);
-            sendMinefieldCellDto(new MinefieldCellDto(fieldCell));
+            minefieldCellDtoEventSender.notifyAllListeners(
+                    new MinefieldCellDtoEvent(fieldCell));
 
             minefield.decreaseNumOfClosedUnminedCells();
             if (minefield.getNumOfClosedUnminedCells() == 0) {
@@ -95,7 +93,8 @@ public class MinefieldActionPerformer
     public void flagTheCell(MinefieldCell fieldCell) {
         fieldCell.setFlagged(true);
         flagCounter.decreaseNumOfMines();
-        sendMinefieldCellDto(new MinefieldCellDto(fieldCell));
+        minefieldCellDtoEventSender.notifyAllListeners(
+                new MinefieldCellDtoEvent(fieldCell));
     }
 
     public void flagTheCell(int row, int column) {
@@ -105,7 +104,8 @@ public class MinefieldActionPerformer
     public void unflagTheCell(MinefieldCell fieldCell) {
         fieldCell.setFlagged(false);
         flagCounter.increaseNumOfMines();
-        sendMinefieldCellDto(new MinefieldCellDto(fieldCell));
+        minefieldCellDtoEventSender.notifyAllListeners(
+                new MinefieldCellDtoEvent(fieldCell));
     }
 
     public void unflagTheCell(int row, int column) {
@@ -118,12 +118,13 @@ public class MinefieldActionPerformer
                 MinefieldCell currentCell = minefield.getFieldCell(currentRow, currentColumn);
                 if (currentCell.isMined() && !currentCell.isFlagged()) {
                     currentCell.setFlagged(true);
-                    sendMinefieldCellDto(new MinefieldCellDto(currentCell));
+                    minefieldCellDtoEventSender.notifyAllListeners(
+                            new MinefieldCellDtoEvent(currentCell));
                 }
             }
         }
 
-        gameOverNotificator.notifyObserversToWinTheGame();
+        gameOverEventSender.notifyAllListeners(new GameOverEvent(true));
         gameTimer.stopGameTimer();
         leaderboard.tryToRecordNewLeader(minefield.getDifficultyMode(), gameTimer.getGameTime());
     }
@@ -134,42 +135,21 @@ public class MinefieldActionPerformer
                 MinefieldCell currentCell = minefield.getFieldCell(currentRow, currentColumn);
                 if (currentCell.isMined() && !currentCell.isFlagged()) {
                     currentCell.setOpened(true);
-                    sendMinefieldCellDto(new MinefieldCellDto(currentCell));
+                    minefieldCellDtoEventSender.notifyAllListeners(
+                            new MinefieldCellDtoEvent(currentCell));
                 }
                 if (!currentCell.isMined() && currentCell.isFlagged()) {
                     currentCell.setOpened(true);
-                    sendMinefieldCellDto(new MinefieldCellDto(currentCell));
+                    minefieldCellDtoEventSender.notifyAllListeners(
+                            new MinefieldCellDtoEvent(currentCell));
                 }
             }
         }
 
-        sendMinefieldCellDto(new MinefieldCellDto(openedMinedCell, true));
+        minefieldCellDtoEventSender.notifyAllListeners(
+                new MinefieldCellDtoEvent(openedMinedCell, true));
 
-        gameOverNotificator.notifyObserversToLoseTheGame();
+        gameOverEventSender.notifyAllListeners(new GameOverEvent(false));
         gameTimer.stopGameTimer();
-    }
-
-    @Override
-    public void registerObserver(MinefieldActionPerformerObserver observer) {
-        if (!observers.contains(observer)) {
-            observers.add(observer);
-            MVCLogger.logObserverRegistration(log, this, observer);
-        }
-    }
-
-    @Override
-    public void removeObserver(MinefieldActionPerformerObserver observer) {
-        if (observers.contains(observer)) {
-            observers.remove(observer);
-            MVCLogger.logObserverRemoving(log, this, observer);
-        }
-    }
-
-    @Override
-    public void sendMinefieldCellDto(MinefieldCellDto dto) {
-        for (var observer : observers) {
-            MVCLogger.logDtoSending(log, this, observer);
-            observer.acceptMinefieldCellDto(dto);
-        }
     }
 }

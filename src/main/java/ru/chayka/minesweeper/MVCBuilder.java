@@ -3,6 +3,10 @@ package ru.chayka.minesweeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.chayka.minesweeper.controller.MinesweeperController;
+import ru.chayka.minesweeper.eventsystem.EventSystemLogger;
+import ru.chayka.minesweeper.eventsystem.events.MinesweeperEvent;
+import ru.chayka.minesweeper.eventsystem.listeners.MinesweeperEventListener;
+import ru.chayka.minesweeper.eventsystem.senders.MinesweeperEventSender;
 import ru.chayka.minesweeper.model.MinesweeperModel;
 import ru.chayka.minesweeper.view.MinesweeperView;
 
@@ -16,94 +20,107 @@ public class MVCBuilder {
     public static void buildApplication() {
         MinesweeperModel model = new MinesweeperModel();
         MinesweeperView view = new MinesweeperView();
-        MinesweeperController controller = new MinesweeperController();
+        MinesweeperController controller = new MinesweeperController(model);
 
         //создание меню Game
-        view.getViewComponent()
-                .registerAllViewObserversForObservable(
-                        model.getDifficultyModesDtoSender());
+        addListenerForSender(
+                model.getDifficultyModesDtoEventSender(),
+                view.getMainFrame().getGameMenuBar().getGameMenu());
 
         //новая игра
-        view.getViewComponent()
-                .registerObserverForAllViewObservables(
-                        controller.getMinefieldCreatorController());
+        addListenerForSender(
+                view.getMainFrame().getGameMenuBar().getGameMenu().getNewGameMenuButton().
+                        getUnparameterizedButtonPressedEventSender(),
+                controller.getUnparameterizedButtonsController());
+        addListenerForSender(
+                view.getMainFrame().getOtherElementsPanel().getSmileButton().
+                        getUnparameterizedButtonPressedEventSender(),
+                controller.getUnparameterizedButtonsController());
 
-        controller.getMinefieldCreatorController()
-                .setMinesweeperModel(model);
-
-        view.getViewComponent()
-                .registerAllViewObserversForObservable(
-                        model.getMinefieldCreator());
+        addListenerForSender(
+                model.getMinefieldCreator().getMinefieldDtoEventSender(),
+                view.getMainFrame().getMinefieldPanel());
 
         //таймер
-        view.getViewComponent()
-                .registerAllViewObserversForObservable(
-                        model.getGameTimer());
+        addListenerForSender(
+                model.getGameTimer().getGameTimeDtoEventSender(),
+                view.getMainFrame().getOtherElementsPanel().getGameTimer());
 
         //счетчик флагов
-        view.getViewComponent()
-                .registerAllViewObserversForObservable(
-                        model.getFlagCounter());
+        addListenerForSender(
+                model.getFlagCounter().getFlagCounterDtoEventSender(),
+                view.getMainFrame().getOtherElementsPanel().getFlagsCounter());
 
         //игровое поле
-        view.getViewComponent()
-                .registerObserverForAllViewObservables(
-                        controller.getMinefieldActionPerformerController());
+        addListenerForSender(
+                view.getMainFrame().getMinefieldPanel().getMinefieldButtonPressedEventSender(),
+                controller.getMinefieldButtonsController());
 
-        controller.getMinefieldActionPerformerController()
-                .setMinefieldActionPerformerModel(
-                        model.getMinefieldActionPerformer());
-
-        view.getViewComponent()
-                .registerAllViewObserversForObservable(
-                        model.getMinefieldActionPerformer());
+        addListenerForSender(
+                model.getMinefieldActionPerformer().getMinefieldCellDtoEventSender(),
+                view.getMainFrame().getMinefieldPanel());
 
         //конец игры
-        view.getViewComponent()
-                .registerAllViewObserversForObservable(
-                        model.getMinefieldActionPerformer().getGameOverNotificator());
+        addListenerForSender(
+                model.getMinefieldActionPerformer().getGameOverEventSender(),
+                view.getMainFrame().getMinefieldPanel());
+        addListenerForSender(
+                model.getMinefieldActionPerformer().getGameOverEventSender(),
+                view.getMainFrame().getOtherElementsPanel().getSmileButton());
 
         //кнопка About
-        view.getViewComponent()
-                .registerObserverForAllViewObservables(
-                        controller.getAboutMinesweeperController());
+        addListenerForSender(
+                view.getMainFrame().getGameMenuBar().getHelpMenu().getAboutMenuButton().
+                        getUnparameterizedButtonPressedEventSender(),
+                controller.getUnparameterizedButtonsController());
 
-        controller.getAboutMinesweeperController()
-                .setAboutMinesweeperModel(
-                        model.getAboutMinesweeper());
-
-        view.getViewComponent()
-                .registerAllViewObserversForObservable(
-                        model.getAboutMinesweeper());
+        addListenerForSender(
+                model.getAboutMinesweeper().getAboutDtoEventSender(),
+                view.getAboutFrame());
 
         //таблица рекордов
-        view.getViewComponent()
-                .registerObserverForAllViewObservables(
-                        controller.getLeaderboardController());
+        addListenerForSender(
+                view.getMainFrame().getGameMenuBar().getGameMenu().getHighScoresMenuButton().
+                        getUnparameterizedButtonPressedEventSender(),
+                controller.getUnparameterizedButtonsController());
+        addListenerForSender(
+                view.getRecordNewLeaderFrame().getNewLeaderDtoEventSender(),
+                controller.getRecordNewLeaderButtonController());
+        addListenerForSender(
+                view.getLeaderboardFrame().getResetResultsButton().
+                        getUnparameterizedButtonPressedEventSender(),
+                controller.getUnparameterizedButtonsController());
 
-        controller.getLeaderboardController()
-                .setLeaderboardModel(
-                        model.getLeaderboard());
-
-        view.getViewComponent()
-                .registerAllViewObserversForObservable(
-                        model.getLeaderboard());
-
-        view.getViewComponent()
-                .registerAllViewObserversForObservable(
-                        model.getLeaderboard().getRecordNewLeaderNotificator());
+        addListenerForSender(
+                model.getLeaderboard().getLeaderboardDtoEventSender(),
+                view.getLeaderboardFrame());
+        addListenerForSender(
+                model.getLeaderboard().getRecordNewLeaderEventSender(),
+                view.getRecordNewLeaderFrame());
 
         model.createInitMinefield();
 
         //смена сложности игры
         //идет после инициализации игрового поля в модели, т.к.
         //кнопки для переключения сложности создаются только после инициализации
-        view.getViewComponent()
-                .registerObserverForAllViewObservables(
-                        controller.getMinefieldCreatorController());
+        for (var setDifficultyMenuButton :
+                view.getMainFrame().getGameMenuBar().getGameMenu().getSetDifficultyMenuButtons()) {
+            addListenerForSender(
+                    setDifficultyMenuButton.getDifficultyModeButtonPressedEventSender(),
+                    controller.getDifficultyModeButtonsController());
+        }
 
         view.showMainFrame();
 
-        log.debug("Application built successfully");
+        log.debug("Application built successfully" + System.lineSeparator());
+    }
+
+    private static <
+            S extends MinesweeperEventSender<L, E>,
+            L extends MinesweeperEventListener,
+            E extends MinesweeperEvent>
+    void addListenerForSender(S sender, L listener) {
+        boolean listenerAddingResult = sender.addListener(listener);
+        EventSystemLogger.logListenerAddingResult(log, listenerAddingResult, sender, listener);
     }
 }

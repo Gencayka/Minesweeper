@@ -1,36 +1,37 @@
 package ru.chayka.minesweeper.controller;
 
-import ru.chayka.minesweeper.controller.components.AboutMinesweeperController;
-import ru.chayka.minesweeper.controller.components.LeaderboardController;
-import ru.chayka.minesweeper.controller.components.MinefieldActionPerformerController;
-import ru.chayka.minesweeper.controller.components.MinefieldCreatorController;
+import ru.chayka.minesweeper.controller.components.DifficultyModeButtonsController;
+import ru.chayka.minesweeper.controller.components.MinefieldButtonsController;
+import ru.chayka.minesweeper.controller.components.RecordNewLeaderButtonController;
+import ru.chayka.minesweeper.controller.components.UnparameterizedButtonsController;
+import ru.chayka.minesweeper.model.MinesweeperModel;
 
 public class MinesweeperController {
-    private final MinefieldActionPerformerController minefieldActionPerformerController;
-    private final MinefieldCreatorController minefieldCreatorController;
-    private final AboutMinesweeperController aboutMinesweeperController;
-    private final LeaderboardController leaderboardController;
+    private final UnparameterizedButtonsController unparameterizedButtonsController;
+    private final MinefieldButtonsController minefieldButtonsController;
+    private final DifficultyModeButtonsController difficultyModeButtonsController;
+    private final RecordNewLeaderButtonController recordNewLeaderButtonController;
 
-    public MinesweeperController() {
-        minefieldActionPerformerController = new MinefieldActionPerformerController();
-        minefieldCreatorController = new MinefieldCreatorController();
-        aboutMinesweeperController = new AboutMinesweeperController();
-        leaderboardController = new LeaderboardController();
+    public MinesweeperController(MinesweeperModel model) {
+        unparameterizedButtonsController = new UnparameterizedButtonsController(model);
+        minefieldButtonsController = new MinefieldButtonsController(model);
+        difficultyModeButtonsController = new DifficultyModeButtonsController(model);
+        recordNewLeaderButtonController = new RecordNewLeaderButtonController(model);
     }
 
-    public MinefieldActionPerformerController getMinefieldActionPerformerController() {
-        return minefieldActionPerformerController;
+    public UnparameterizedButtonsController getUnparameterizedButtonsController() {
+        return unparameterizedButtonsController;
     }
 
-    public MinefieldCreatorController getMinefieldCreatorController() {
-        return minefieldCreatorController;
+    public MinefieldButtonsController getMinefieldButtonsController() {
+        return minefieldButtonsController;
     }
 
-    public AboutMinesweeperController getAboutMinesweeperController() {
-        return aboutMinesweeperController;
+    public DifficultyModeButtonsController getDifficultyModeButtonsController() {
+        return difficultyModeButtonsController;
     }
 
-    public LeaderboardController getLeaderboardController() {
-        return leaderboardController;
+    public RecordNewLeaderButtonController getRecordNewLeaderButtonController() {
+        return recordNewLeaderButtonController;
     }
 }

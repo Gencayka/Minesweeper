@@ -1,7 +1,8 @@
 package ru.chayka.minesweeper.model;
 
+import ru.chayka.minesweeper.eventsystem.events.model.DifficultyModesDtoEvent;
+import ru.chayka.minesweeper.eventsystem.senders.model.DifficultyModesDtoEventSender;
 import ru.chayka.minesweeper.model.about.AboutMinesweeper;
-import ru.chayka.minesweeper.model.difficultyModesDtoSender.DifficultyModesDtoSender;
 import ru.chayka.minesweeper.model.leaderboard.Leaderboard;
 import ru.chayka.minesweeper.model.minefield.FlagCounter;
 import ru.chayka.minesweeper.model.minefield.Minefield;
@@ -16,7 +17,7 @@ public class MinesweeperModel {
     private final FlagCounter flagCounter;
     private final Leaderboard leaderboard;
     private final AboutMinesweeper aboutMinesweeper;
-    private final DifficultyModesDtoSender difficultyModesDtoSender;
+    private final DifficultyModesDtoEventSender difficultyModesDtoEventSender;
 
     public MinesweeperModel() {
         gameTimer = new GameTimer();
@@ -24,7 +25,7 @@ public class MinesweeperModel {
         minefieldCreator = new MinefieldCreator();
         leaderboard = new Leaderboard();
         aboutMinesweeper = new AboutMinesweeper();
-        difficultyModesDtoSender = new DifficultyModesDtoSender();
+        difficultyModesDtoEventSender = new DifficultyModesDtoEventSender();
 
         minefieldActionPerformer = new MinefieldActionPerformer(gameTimer, flagCounter, leaderboard);
     }
@@ -63,12 +64,12 @@ public class MinesweeperModel {
         gameTimer.clearGameTimer();
     }
 
-    public DifficultyModesDtoSender getDifficultyModesDtoSender() {
-        return difficultyModesDtoSender;
+    public DifficultyModesDtoEventSender getDifficultyModesDtoEventSender() {
+        return difficultyModesDtoEventSender;
     }
 
     public void createInitMinefield() {
-        difficultyModesDtoSender.sendDifficultyModesDto();
+        difficultyModesDtoEventSender.notifyAllListeners(new DifficultyModesDtoEvent());
         createNewMinefield(DifficultyMode.INITIAL_DIFFICULTY_MODE);
     }
 }

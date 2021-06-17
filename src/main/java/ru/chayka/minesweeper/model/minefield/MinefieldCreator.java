@@ -1,24 +1,24 @@
 package ru.chayka.minesweeper.model.minefield;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ru.chayka.minesweeper.eventsystem.events.model.MinefieldDtoEvent;
+import ru.chayka.minesweeper.eventsystem.senders.model.MinefieldDtoEventSender;
 import ru.chayka.minesweeper.model.DifficultyMode;
-import ru.chayka.minesweeper.model.MVCLogger;
-import ru.chayka.minesweeper.observerInterfaces.observables.model.MinefieldCreatorObservable;
-import ru.chayka.minesweeper.observerInterfaces.observers.view.MinefieldCreatorObserver;
 
-import java.util.ArrayList;
-
-public class MinefieldCreator
-        implements MinefieldCreatorObservable {
-    private static final Logger log = LoggerFactory.getLogger(MinefieldCreator.class.getName());
-
-    private final ArrayList<MinefieldCreatorObserver> observers = new ArrayList<>();
-
+public class MinefieldCreator {
     private DifficultyMode lastDifficultyMode;
+
+    private final MinefieldDtoEventSender minefieldDtoEventSender;
+
+    public MinefieldCreator() {
+        minefieldDtoEventSender = new MinefieldDtoEventSender();
+    }
 
     public DifficultyMode getLastDifficultyMode() {
         return lastDifficultyMode;
+    }
+
+    public MinefieldDtoEventSender getMinefieldDtoEventSender() {
+        return minefieldDtoEventSender;
     }
 
     public Minefield createNewMinefield(DifficultyMode difficultyMode) {
@@ -26,7 +26,8 @@ public class MinefieldCreator
         Minefield minefield = new Minefield(difficultyMode, generateClearField(difficultyMode.numOfRows, difficultyMode.numOfColumns));
         setAdjacentCells(minefield, difficultyMode.numOfRows, difficultyMode.numOfColumns);
 
-        notifyObservers(difficultyMode.numOfRows, difficultyMode.numOfColumns);
+        minefieldDtoEventSender.notifyAllListeners(
+                new MinefieldDtoEvent(difficultyMode.numOfRows, difficultyMode.numOfColumns));
         return minefield;
     }
 
@@ -70,30 +71,6 @@ public class MinefieldCreator
                     currentCell.adjacentCells.add(cells[currentRow - 1][currentColumn - 1]);
                 }
             }
-        }
-    }
-
-    @Override
-    public void registerObserver(MinefieldCreatorObserver observer) {
-        if (!observers.contains(observer)) {
-            observers.add(observer);
-            MVCLogger.logObserverRegistration(log, this, observer);
-        }
-    }
-
-    @Override
-    public void removeObserver(MinefieldCreatorObserver observer) {
-        if (observers.contains(observer)) {
-            observers.remove(observer);
-            MVCLogger.logObserverRemoving(log, this, observer);
-        }
-    }
-
-    @Override
-    public void notifyObservers(int numOfRows, int numOfColumns) {
-        for (MinefieldCreatorObserver observer : observers) {
-            MVCLogger.logObserversNotification(log, this, observer);
-            observer.createNewMinefield(numOfRows, numOfColumns);
         }
     }
 }

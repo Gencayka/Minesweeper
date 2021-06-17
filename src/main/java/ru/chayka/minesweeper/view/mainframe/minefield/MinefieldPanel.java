@@ -1,0 +1,154 @@
+package ru.chayka.minesweeper.view.mainframe.minefield;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.chayka.minesweeper.eventsystem.EventSystemLogger;
+import ru.chayka.minesweeper.eventsystem.events.model.GameOverEvent;
+import ru.chayka.minesweeper.eventsystem.events.model.MinefieldCellDtoEvent;
+import ru.chayka.minesweeper.eventsystem.events.model.MinefieldDtoEvent;
+import ru.chayka.minesweeper.eventsystem.events.view.MinefieldButtonPressedEvent;
+import ru.chayka.minesweeper.eventsystem.listeners.view.GameOverEventListener;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MinefieldCellDtoEventListener;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MinefieldDtoEventListener;
+import ru.chayka.minesweeper.eventsystem.senders.view.MinefieldButtonPressedEventSender;
+import ru.chayka.minesweeper.view.MouseButton;
+import ru.chayka.minesweeper.view.mainframe.minefield.minefieldbutton.MinefieldButton;
+import ru.chayka.minesweeper.view.mainframe.minefield.minefieldbutton.MinefieldButtonState;
+
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.plaf.BorderUIResource;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+public class MinefieldPanel
+        implements MinefieldCellDtoEventListener, MinefieldDtoEventListener, GameOverEventListener,
+        MouseListener {
+    private static final Logger log = LoggerFactory.getLogger(MinefieldPanel.class.getName());
+
+    private final JPanel jPanel;
+
+    private final MinefieldButtonPressedEventSender minefieldButtonPressedEventSender;
+
+    public MinefieldButton[][] minefieldButtons;
+    private boolean isActive;
+
+    public MinefieldPanel() {
+        jPanel = new JPanel();
+
+        jPanel.setBorder(new BorderUIResource.BevelBorderUIResource(BevelBorder.LOWERED));
+        isActive = true;
+
+        minefieldButtonPressedEventSender = new MinefieldButtonPressedEventSender();
+    }
+
+    public JPanel getJPanel() {
+        return jPanel;
+    }
+
+    public MinefieldButtonPressedEventSender getMinefieldButtonPressedEventSender() {
+        return minefieldButtonPressedEventSender;
+    }
+
+    private void deactivateMinefield() {
+        isActive = false;
+        for (MinefieldButton[] currentRow : minefieldButtons) {
+            for (MinefieldButton button : currentRow) {
+                button.makeVisuallyDisabled();
+            }
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        MouseButton mouseButton = MouseButton.numCodeToEnum(e.getButton());
+        MinefieldButton button = (MinefieldButton) e.getSource();
+        if (isActive) {
+            minefieldButtonPressedEventSender.notifyAllListeners(
+                    new MinefieldButtonPressedEvent(
+                            button.getRow(),
+                            button.getColumn(),
+                            mouseButton,
+                            button.getState()));
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void acceptEvent(MinefieldCellDtoEvent event) {
+        EventSystemLogger.logEventAccepting(log, this, event);
+
+        MinefieldButton dtoRelatedMinefieldButton = minefieldButtons[event.getRow()][event.getColumn()];
+
+        if (event.isOpenedWithWrongMove()) {
+            dtoRelatedMinefieldButton.setState(MinefieldButtonState.MINE_OPENED_WITH_WRONG_MOVE);
+        } else {
+            if (event.isOpened()) {
+                if (!event.isMined() && !event.isFlagged()) {
+                    dtoRelatedMinefieldButton.setState(
+                            MinefieldButtonState.intToMinefieldButtonState(event.getNumOfAdjacentMines()));
+                } else if (event.isMined() && !event.isFlagged()) {
+                    dtoRelatedMinefieldButton.setState(MinefieldButtonState.MINE);
+                } else if (!event.isMined()) {
+                    dtoRelatedMinefieldButton.setState(MinefieldButtonState.WRONGLY_FLAGGED_MINE);
+                }
+            } else {
+                if (event.isFlagged()) {
+                    dtoRelatedMinefieldButton.setState(MinefieldButtonState.FLAG);
+                } else {
+                    dtoRelatedMinefieldButton.setState(MinefieldButtonState.CLOSED);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void acceptEvent(MinefieldDtoEvent event) {
+        EventSystemLogger.logEventAccepting(log, this, event);
+        createNewMinefield(event.getNumOfRows(), event.getNumOfColumns());
+    }
+
+    @Override
+    public void acceptEvent(GameOverEvent event) {
+        EventSystemLogger.logEventAccepting(log, this, event);
+        deactivateMinefield();
+    }
+
+
+    private void createNewMinefield(int numOfRows, int numOfColumns) {
+        isActive = true;
+
+        jPanel.setLayout(new GridLayout(numOfRows, numOfColumns));
+        jPanel.removeAll();
+        jPanel.revalidate();
+
+        minefieldButtons = new MinefieldButton[numOfRows][numOfColumns];
+        for (int currentRow = 0; currentRow < numOfRows; currentRow++) {
+            for (int currentColumn = 0; currentColumn < numOfColumns; currentColumn++) {
+                minefieldButtons[currentRow][currentColumn] = new MinefieldButton(currentRow, currentColumn);
+                MinefieldButton currentButton = minefieldButtons[currentRow][currentColumn];
+                currentButton.addMouseListener(this);
+                jPanel.add(currentButton);
+            }
+        }
+        jPanel.repaint();
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(jPanel);
+        parentFrame.pack();
+    }
+}

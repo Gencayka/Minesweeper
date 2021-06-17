@@ -1,35 +1,27 @@
 package ru.chayka.minesweeper.model.leaderboard;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.chayka.minesweeper.dto.LeaderboardDto;
+import ru.chayka.minesweeper.eventsystem.events.model.LeaderboardDtoEvent;
+import ru.chayka.minesweeper.eventsystem.events.model.RecordNewLeaderEvent;
+import ru.chayka.minesweeper.eventsystem.senders.model.LeaderboardDtoEventSender;
+import ru.chayka.minesweeper.eventsystem.senders.model.RecordNewLeaderEventSender;
 import ru.chayka.minesweeper.model.DifficultyMode;
-import ru.chayka.minesweeper.model.MVCLogger;
-import ru.chayka.minesweeper.observerInterfaces.observables.model.LeaderboardObservable;
-import ru.chayka.minesweeper.observerInterfaces.observers.view.LeaderboardObserver;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class Leaderboard
-        implements LeaderboardObservable {
-    private static final Logger log = LoggerFactory.getLogger(Leaderboard.class.getName());
-
-    private final ArrayList<LeaderboardObserver> observers;
-    private final RecordNewLeaderNotificator recordNewLeaderNotificator;
-
+public class Leaderboard {
     private ArrayList<LeaderEntry> leaderEntries;
     private LeaderEntry bufferEntry;
 
     public static final String XML_FILE_NAME = "./leaderboard.xml";
 
+    private final LeaderboardDtoEventSender leaderboardDtoEventSender;
+    private final RecordNewLeaderEventSender recordNewLeaderEventSender;
+
     public Leaderboard() {
         leaderEntries = new ArrayList<>();
-
-        observers = new ArrayList<>();
-        recordNewLeaderNotificator = new RecordNewLeaderNotificator();
 
         bufferEntry = new LeaderEntry();
 
@@ -45,6 +37,9 @@ public class Leaderboard
         } else {
             createNewLeaderboard();
         }
+
+        leaderboardDtoEventSender = new LeaderboardDtoEventSender();
+        recordNewLeaderEventSender = new RecordNewLeaderEventSender();
     }
 
     public ArrayList<LeaderEntry> getLeaderEntries() {
@@ -53,6 +48,14 @@ public class Leaderboard
 
     public void setLeaderEntries(ArrayList<LeaderEntry> leaderEntries) {
         this.leaderEntries = leaderEntries;
+    }
+
+    public LeaderboardDtoEventSender getLeaderboardDtoEventSender() {
+        return leaderboardDtoEventSender;
+    }
+
+    public RecordNewLeaderEventSender getRecordNewLeaderEventSender() {
+        return recordNewLeaderEventSender;
     }
 
     public void createNewLeaderboard() {
@@ -65,7 +68,7 @@ public class Leaderboard
 
     public void resetLeaderboard() {
         createNewLeaderboard();
-        sendLeaderboardInfoToView();
+        sendLeaderboardEntriesToView();
     }
 
     private boolean checkLeaderboardFileConformity() {
@@ -87,7 +90,8 @@ public class Leaderboard
             if (leaderEntry.getStrDifficultyMode().equals(difficultyMode.toString()) &&
                     leaderEntry.getTime() > time) {
                 bufferEntry = new LeaderEntry(difficultyMode, time);
-                recordNewLeaderNotificator.notifyObservers(difficultyMode.toString());
+                recordNewLeaderEventSender.notifyAllListeners(
+                        new RecordNewLeaderEvent(difficultyMode.toString()));
             }
         }
     }
@@ -100,38 +104,10 @@ public class Leaderboard
             }
         }
         LeaderBoardXMLDao.serializeToXML(this);
-        sendLeaderboardInfoToView();
+        sendLeaderboardEntriesToView();
     }
 
-    public void sendLeaderboardInfoToView() {
-        sendLeaderboardDto(new LeaderboardDto(this));
-    }
-
-    public RecordNewLeaderNotificator getRecordNewLeaderNotificator() {
-        return recordNewLeaderNotificator;
-    }
-
-    @Override
-    public void registerObserver(LeaderboardObserver observer) {
-        if (!observers.contains(observer)) {
-            observers.add(observer);
-            MVCLogger.logObserverRegistration(log, this, observer);
-        }
-    }
-
-    @Override
-    public void removeObserver(LeaderboardObserver observer) {
-        if (observers.contains(observer)) {
-            observers.remove(observer);
-            MVCLogger.logObserverRemoving(log, this, observer);
-        }
-    }
-
-    @Override
-    public void sendLeaderboardDto(LeaderboardDto dto) {
-        for (var observer : observers) {
-            MVCLogger.logDtoSending(log, this, observer);
-            observer.acceptLeaderboardDto(dto);
-        }
+    public void sendLeaderboardEntriesToView() {
+        leaderboardDtoEventSender.notifyAllListeners(new LeaderboardDtoEvent(this));
     }
 }
