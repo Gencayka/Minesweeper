@@ -1,15 +1,11 @@
-package ru.chayka.minesweeper.view.mainframe.menu.gamemenu;
+package ru.chayka.minesweeper.view.mainframe.menu;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.chayka.minesweeper.eventsystem.events.view.DifficultyModeButtonPressedEvent;
 import ru.chayka.minesweeper.eventsystem.senders.view.DifficultyModeButtonPressedEventSender;
 
 import javax.swing.*;
 
 public class SetDifficultyMenuButton {
-    private static final Logger log = LoggerFactory.getLogger(SetDifficultyMenuButton.class.getName());
-
     private final JRadioButtonMenuItem jRadioButtonMenuItem;
 
     private final DifficultyModeButtonPressedEventSender difficultyModeButtonPressedEventSender;

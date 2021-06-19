@@ -29,8 +29,7 @@ public class MVCBuilder {
 
         //новая игра
         addListenerForSender(
-                view.getMainFrame().getGameMenuBar().getGameMenu().getNewGameMenuButton().
-                        getUnparameterizedButtonPressedEventSender(),
+                view.getMainFrame().getGameMenuBar().getGameMenu().getUnparameterizedButtonPressedEventSender(),
                 controller.getUnparameterizedButtonsController());
         addListenerForSender(
                 view.getMainFrame().getOtherElementsPanel().getSmileButton().
@@ -70,8 +69,7 @@ public class MVCBuilder {
 
         //кнопка About
         addListenerForSender(
-                view.getMainFrame().getGameMenuBar().getHelpMenu().getAboutMenuButton().
-                        getUnparameterizedButtonPressedEventSender(),
+                view.getMainFrame().getGameMenuBar().getHelpMenu().getUnparameterizedButtonPressedEventSender(),
                 controller.getUnparameterizedButtonsController());
 
         addListenerForSender(
@@ -80,15 +78,10 @@ public class MVCBuilder {
 
         //таблица рекордов
         addListenerForSender(
-                view.getMainFrame().getGameMenuBar().getGameMenu().getHighScoresMenuButton().
-                        getUnparameterizedButtonPressedEventSender(),
-                controller.getUnparameterizedButtonsController());
-        addListenerForSender(
                 view.getRecordNewLeaderFrame().getNewLeaderDtoEventSender(),
                 controller.getRecordNewLeaderButtonController());
         addListenerForSender(
-                view.getLeaderboardFrame().getResetResultsButton().
-                        getUnparameterizedButtonPressedEventSender(),
+                view.getLeaderboardFrame().getUnparameterizedButtonPressedEventSender(),
                 controller.getUnparameterizedButtonsController());
 
         addListenerForSender(

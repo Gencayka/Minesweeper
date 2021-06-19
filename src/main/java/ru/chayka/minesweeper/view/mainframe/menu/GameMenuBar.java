@@ -1,11 +1,13 @@
 package ru.chayka.minesweeper.view.mainframe.menu;
 
-import ru.chayka.minesweeper.view.mainframe.menu.gamemenu.GameMenu;
-import ru.chayka.minesweeper.view.mainframe.menu.helpmenu.HelpMenu;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 
 public class GameMenuBar {
+    private static final Logger log = LoggerFactory.getLogger(GameMenuBar.class.getName());
+
     private final JMenuBar jMenuBar;
 
     private final GameMenu gameMenu;
@@ -13,12 +15,10 @@ public class GameMenuBar {
 
     public GameMenuBar() {
         jMenuBar = new JMenuBar();
-
         gameMenu = new GameMenu();
-        jMenuBar.add(gameMenu.getJMenu());
-
         helpMenu = new HelpMenu();
-        jMenuBar.add(helpMenu.getJMenu());
+
+        assembleMenuBar();
     }
 
     public GameMenu getGameMenu() {
@@ -31,5 +31,13 @@ public class GameMenuBar {
 
     public JMenuBar getJMenuBar() {
         return jMenuBar;
+    }
+
+    private void assembleMenuBar() {
+        jMenuBar.add(gameMenu.getJMenu());
+
+        jMenuBar.add(helpMenu.getJMenu());
+
+        log.debug("Game Menu Bar is assembled");
     }
 }

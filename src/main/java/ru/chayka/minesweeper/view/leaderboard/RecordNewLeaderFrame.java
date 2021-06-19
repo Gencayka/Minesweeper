@@ -31,8 +31,8 @@ public class RecordNewLeaderFrame
 
         jDialog = new JDialog();
         newRecordLabel = new NewRecordLabel();
-        textField = new JTextField(defaultLeaderName);
-        okButton = new JButton("Ok");
+        textField = new JTextField();
+        okButton = new JButton();
 
         newLeaderDtoEventSender = new NewLeaderDtoEventSender();
 
@@ -71,12 +71,15 @@ public class RecordNewLeaderFrame
         labelPanel.add(newRecordLabel.getJLabel());
         jDialog.add(labelPanel, gridBagConstraints);
 
+        textField.setText(defaultLeaderName);
         gridBagConstraints.gridy = 1;
         textField.setPreferredSize(new Dimension(150, 18));
         JPanel textFieldPanel = new JPanel();
         textFieldPanel.add(textField);
         jDialog.add(textFieldPanel, gridBagConstraints);
 
+        okButton.setText("Ok");
+        okButton.setFocusable(false);
         gridBagConstraints.gridy = 2;
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(okButton);
