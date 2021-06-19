@@ -19,34 +19,19 @@ public class LeaderboardFrame
 
     private final LeaderboardPanel leaderboardPanel;
     private final ResetResultsButton resetResultsButton;
+    private final JButton okButton;
 
     public LeaderboardFrame(JFrame mainFrame) {
-        jDialog = new JDialog();
-
         this.mainFrame = mainFrame;
 
-        jDialog.setTitle("Leaderboard");
-        jDialog.setLayout(new GridBagLayout());
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridy = 0;
-
+        jDialog = new JDialog();
         leaderboardPanel = new LeaderboardPanel();
-        jDialog.add(leaderboardPanel.getJPanel(), gridBagConstraints);
-
         resetResultsButton = new ResetResultsButton();
+        okButton = new JButton();
 
-        JButton okButton = new JButton("Ok");
-        okButton.setFocusable(false);
         okButton.addActionListener(event -> jDialog.setVisible(false));
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(resetResultsButton.getJButton());
-        buttonPanel.add(okButton);
-        gridBagConstraints.gridy = 1;
-        jDialog.add(buttonPanel, gridBagConstraints);
-
-        jDialog.setResizable(false);
-        jDialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
+        assembleFrame();
     }
 
     public LeaderboardPanel getLeaderboardPanel() {
@@ -69,5 +54,28 @@ public class LeaderboardFrame
             jDialog.setLocationRelativeTo(mainFrame);
             jDialog.setVisible(true);
         }
+    }
+
+    private void assembleFrame() {
+        jDialog.setTitle("Leaderboard");
+        jDialog.setLayout(new GridBagLayout());
+
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        jDialog.add(leaderboardPanel.getJPanel(), gridBagConstraints);
+
+        okButton.setText("Ok");
+        okButton.setFocusable(false);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(resetResultsButton.getJButton());
+        buttonPanel.add(okButton);
+        gridBagConstraints.gridy = 1;
+        jDialog.add(buttonPanel, gridBagConstraints);
+
+        jDialog.setResizable(false);
+        jDialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
+
+        log.debug("Leaderboard Frame is assembled");
     }
 }

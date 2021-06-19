@@ -1,5 +1,7 @@
 package ru.chayka.minesweeper.view.mainframe;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.chayka.minesweeper.view.mainframe.menu.GameMenuBar;
 import ru.chayka.minesweeper.view.mainframe.minefield.MinefieldPanel;
 import ru.chayka.minesweeper.view.mainframe.otherelements.OtherElementsPanel;
@@ -8,6 +10,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame {
+    private static final Logger log = LoggerFactory.getLogger(MainFrame.class.getName());
+
     private final JFrame jFrame;
 
     private final GameMenuBar gameMenuBar;
@@ -16,41 +20,11 @@ public class MainFrame {
 
     public MainFrame() {
         jFrame = new JFrame();
-
-        jFrame.setTitle("Minesweeper");
-        jFrame.setLayout(new GridBagLayout());
-        jFrame.setLocationRelativeTo(null);
-        jFrame.setResizable(false);
-        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //Menu Bar
         gameMenuBar = new GameMenuBar();
-
-        GridBagConstraints menuConstraints = new GridBagConstraints();
-        menuConstraints.gridy = 0;
-        menuConstraints.anchor = GridBagConstraints.WEST;
-        menuConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        jFrame.add(gameMenuBar.getJMenuBar(), menuConstraints);
-
-        //Other Elements Panel
         otherElementsPanel = new OtherElementsPanel();
-
-        GridBagConstraints otherElementsPanelConstraints = new GridBagConstraints();
-        otherElementsPanelConstraints.gridy = 1;
-        otherElementsPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        jFrame.add(otherElementsPanel.getJPanel(), otherElementsPanelConstraints);
-
-        //Minefield
         minefieldPanel = new MinefieldPanel();
 
-        GridBagConstraints minefieldConstraints = new GridBagConstraints();
-        minefieldConstraints.gridy = 2;
-
-        jFrame.add(minefieldPanel.getJPanel(), minefieldConstraints);
-
-        jFrame.pack();
+        assembleFrame();
     }
 
     public GameMenuBar getGameMenuBar() {
@@ -67,5 +41,32 @@ public class MainFrame {
 
     public JFrame getJFrame() {
         return jFrame;
+    }
+
+    private void assembleFrame() {
+        jFrame.setTitle("Minesweeper");
+        jFrame.setLayout(new GridBagLayout());
+        jFrame.setLocationRelativeTo(null);
+        jFrame.setResizable(false);
+        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        GridBagConstraints menuConstraints = new GridBagConstraints();
+        menuConstraints.gridy = 0;
+        menuConstraints.anchor = GridBagConstraints.WEST;
+        menuConstraints.fill = GridBagConstraints.HORIZONTAL;
+        jFrame.add(gameMenuBar.getJMenuBar(), menuConstraints);
+
+        GridBagConstraints otherElementsPanelConstraints = new GridBagConstraints();
+        otherElementsPanelConstraints.gridy = 1;
+        otherElementsPanelConstraints.fill = GridBagConstraints.HORIZONTAL;
+        jFrame.add(otherElementsPanel.getJPanel(), otherElementsPanelConstraints);
+
+        GridBagConstraints minefieldConstraints = new GridBagConstraints();
+        minefieldConstraints.gridy = 2;
+        jFrame.add(minefieldPanel.getJPanel(), minefieldConstraints);
+
+        jFrame.pack();
+
+        log.debug("Main Frame is assembled");
     }
 }

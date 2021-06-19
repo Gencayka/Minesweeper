@@ -17,30 +17,18 @@ public class AboutFrame
 
     private final JFrame mainFrame;
     private final JLabel aboutLabel;
+    private final JButton okButton;
 
     public AboutFrame(JFrame mainFrame) {
-        jDialog = new JDialog();
-
         this.mainFrame = mainFrame;
 
-        jDialog.setLayout(new BorderLayout());
-        jDialog.setPreferredSize(new Dimension(200, 200));
-        jDialog.setLocationRelativeTo(mainFrame);
-        jDialog.setResizable(false);
-
+        jDialog = new JDialog();
         aboutLabel = new JLabel();
-        aboutLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        aboutLabel.setVerticalAlignment(SwingConstants.CENTER);
-        jDialog.add(aboutLabel, BorderLayout.CENTER);
+        okButton = new JButton();
 
-        JButton okButton = new JButton("Ok");
         okButton.addActionListener(event -> jDialog.setVisible(false));
-        okButton.setFocusable(false);
-        JPanel okButtonPanel = new JPanel();
-        okButtonPanel.add(okButton);
-        jDialog.add(okButtonPanel, BorderLayout.PAGE_END);
 
-        jDialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
+        assembleFrame();
     }
 
     @Override
@@ -52,5 +40,26 @@ public class AboutFrame
         jDialog.pack();
         jDialog.setLocationRelativeTo(mainFrame);
         jDialog.setVisible(true);
+    }
+
+    private void assembleFrame() {
+        jDialog.setLayout(new BorderLayout());
+        jDialog.setPreferredSize(new Dimension(200, 200));
+        jDialog.setLocationRelativeTo(mainFrame);
+        jDialog.setResizable(false);
+
+        aboutLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        aboutLabel.setVerticalAlignment(SwingConstants.CENTER);
+        jDialog.add(aboutLabel, BorderLayout.CENTER);
+
+        okButton.setText("Ok");
+        okButton.setFocusable(false);
+        JPanel okButtonPanel = new JPanel();
+        okButtonPanel.add(okButton);
+        jDialog.add(okButtonPanel, BorderLayout.PAGE_END);
+
+        jDialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
+
+        log.debug("About Frame is assembled");
     }
 }
