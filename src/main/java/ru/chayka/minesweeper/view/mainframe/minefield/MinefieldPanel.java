@@ -2,15 +2,15 @@ package ru.chayka.minesweeper.view.mainframe.minefield;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.chayka.minesweeper.eventsystem.EventSystemLogger;
-import ru.chayka.minesweeper.eventsystem.events.model.GameOverEvent;
-import ru.chayka.minesweeper.eventsystem.events.model.MinefieldCellDtoEvent;
-import ru.chayka.minesweeper.eventsystem.events.model.MinefieldDtoEvent;
-import ru.chayka.minesweeper.eventsystem.events.view.MinefieldButtonPressedEvent;
-import ru.chayka.minesweeper.eventsystem.listeners.view.GameOverEventListener;
-import ru.chayka.minesweeper.eventsystem.listeners.view.MinefieldCellDtoEventListener;
-import ru.chayka.minesweeper.eventsystem.listeners.view.MinefieldDtoEventListener;
-import ru.chayka.minesweeper.eventsystem.senders.view.MinefieldButtonPressedEventSender;
+import ru.chayka.minesweeper.eventsystem.MvcEventSystemLogger;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcGameOverEvent;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcMinefieldCellDtoEvent;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcMinefieldDtoEvent;
+import ru.chayka.minesweeper.eventsystem.events.view.MvcMinefieldButtonPressedEvent;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MvcGameOverEventListener;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MvcMinefieldCellDtoEventListener;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MvcMinefieldDtoEventListener;
+import ru.chayka.minesweeper.eventsystem.senders.view.MvcMinefieldButtonPressedEventSender;
 import ru.chayka.minesweeper.view.MouseButton;
 import ru.chayka.minesweeper.view.mainframe.minefield.minefieldbutton.MinefieldButton;
 import ru.chayka.minesweeper.view.mainframe.minefield.minefieldbutton.MinefieldButtonState;
@@ -23,13 +23,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class MinefieldPanel
-        implements MinefieldCellDtoEventListener, MinefieldDtoEventListener, GameOverEventListener,
+        implements MvcMinefieldCellDtoEventListener, MvcMinefieldDtoEventListener, MvcGameOverEventListener,
         MouseListener {
     private static final Logger log = LoggerFactory.getLogger(MinefieldPanel.class.getName());
 
     private final JPanel jPanel;
 
-    private final MinefieldButtonPressedEventSender minefieldButtonPressedEventSender;
+    private final MvcMinefieldButtonPressedEventSender mvcMinefieldButtonPressedEventSender;
 
     public MinefieldButton[][] minefieldButtons;
     private boolean isActive;
@@ -40,15 +40,15 @@ public class MinefieldPanel
         jPanel.setBorder(new BorderUIResource.BevelBorderUIResource(BevelBorder.LOWERED));
         isActive = true;
 
-        minefieldButtonPressedEventSender = new MinefieldButtonPressedEventSender();
+        mvcMinefieldButtonPressedEventSender = new MvcMinefieldButtonPressedEventSender();
     }
 
     public JPanel getJPanel() {
         return jPanel;
     }
 
-    public MinefieldButtonPressedEventSender getMinefieldButtonPressedEventSender() {
-        return minefieldButtonPressedEventSender;
+    public MvcMinefieldButtonPressedEventSender getMvcMinefieldButtonPressedEventSender() {
+        return mvcMinefieldButtonPressedEventSender;
     }
 
     private void deactivateMinefield() {
@@ -65,8 +65,8 @@ public class MinefieldPanel
         MouseButton mouseButton = MouseButton.numCodeToEnum(e.getButton());
         MinefieldButton button = (MinefieldButton) e.getSource();
         if (isActive) {
-            minefieldButtonPressedEventSender.notifyAllListeners(
-                    new MinefieldButtonPressedEvent(
+            mvcMinefieldButtonPressedEventSender.notifyAllListeners(
+                    new MvcMinefieldButtonPressedEvent(
                             button.getRow(),
                             button.getColumn(),
                             mouseButton,
@@ -91,8 +91,8 @@ public class MinefieldPanel
     }
 
     @Override
-    public void acceptEvent(MinefieldCellDtoEvent event) {
-        EventSystemLogger.logEventAccepting(log, this, event);
+    public void acceptEvent(MvcMinefieldCellDtoEvent event) {
+        MvcEventSystemLogger.logEventAccepting(log, this, event);
 
         MinefieldButton dtoRelatedMinefieldButton = minefieldButtons[event.getRow()][event.getColumn()];
 
@@ -119,14 +119,14 @@ public class MinefieldPanel
     }
 
     @Override
-    public void acceptEvent(MinefieldDtoEvent event) {
-        EventSystemLogger.logEventAccepting(log, this, event);
+    public void acceptEvent(MvcMinefieldDtoEvent event) {
+        MvcEventSystemLogger.logEventAccepting(log, this, event);
         createNewMinefield(event.getNumOfRows(), event.getNumOfColumns());
     }
 
     @Override
-    public void acceptEvent(GameOverEvent event) {
-        EventSystemLogger.logEventAccepting(log, this, event);
+    public void acceptEvent(MvcGameOverEvent event) {
+        MvcEventSystemLogger.logEventAccepting(log, this, event);
         deactivateMinefield();
     }
 

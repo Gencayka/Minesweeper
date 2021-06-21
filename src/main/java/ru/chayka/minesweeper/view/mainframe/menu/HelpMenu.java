@@ -2,8 +2,8 @@ package ru.chayka.minesweeper.view.mainframe.menu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.chayka.minesweeper.eventsystem.events.view.UnparameterizedButtonPressedEvent;
-import ru.chayka.minesweeper.eventsystem.senders.view.UnparameterizedButtonPressedEventSender;
+import ru.chayka.minesweeper.eventsystem.events.view.MvcUnparameterizedButtonPressedEvent;
+import ru.chayka.minesweeper.eventsystem.senders.view.MvcUnparameterizedButtonPressedEventSender;
 import ru.chayka.minesweeper.view.UnparameterizedButton;
 
 import javax.swing.*;
@@ -15,17 +15,17 @@ public class HelpMenu {
 
     private final JMenuItem aboutMenuButton;
 
-    private final UnparameterizedButtonPressedEventSender unparameterizedButtonPressedEventSender;
+    private final MvcUnparameterizedButtonPressedEventSender mvcUnparameterizedButtonPressedEventSender;
 
     public HelpMenu() {
         jMenu = new JMenu();
         aboutMenuButton = new JMenuItem();
 
-        unparameterizedButtonPressedEventSender = new UnparameterizedButtonPressedEventSender();
+        mvcUnparameterizedButtonPressedEventSender = new MvcUnparameterizedButtonPressedEventSender();
 
         aboutMenuButton.addActionListener(event ->
-                unparameterizedButtonPressedEventSender.notifyAllListeners(
-                        new UnparameterizedButtonPressedEvent(UnparameterizedButton.ABOUT)));
+                mvcUnparameterizedButtonPressedEventSender.notifyAllListeners(
+                        new MvcUnparameterizedButtonPressedEvent(UnparameterizedButton.ABOUT)));
 
         assembleMenu();
     }
@@ -34,8 +34,8 @@ public class HelpMenu {
         return jMenu;
     }
 
-    public UnparameterizedButtonPressedEventSender getUnparameterizedButtonPressedEventSender() {
-        return unparameterizedButtonPressedEventSender;
+    public MvcUnparameterizedButtonPressedEventSender getMvcUnparameterizedButtonPressedEventSender() {
+        return mvcUnparameterizedButtonPressedEventSender;
     }
 
     private void assembleMenu() {

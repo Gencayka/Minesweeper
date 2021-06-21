@@ -2,17 +2,17 @@ package ru.chayka.minesweeper.view.leaderboard;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.chayka.minesweeper.eventsystem.EventSystemLogger;
-import ru.chayka.minesweeper.eventsystem.events.model.RecordNewLeaderEvent;
-import ru.chayka.minesweeper.eventsystem.events.view.NewLeaderDtoEvent;
-import ru.chayka.minesweeper.eventsystem.listeners.view.RecordNewLeaderEventListener;
-import ru.chayka.minesweeper.eventsystem.senders.view.NewLeaderDtoEventSender;
+import ru.chayka.minesweeper.eventsystem.MvcEventSystemLogger;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcRecordNewLeaderEvent;
+import ru.chayka.minesweeper.eventsystem.events.view.MvcNewLeaderDtoEvent;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MvcRecordNewLeaderEventListener;
+import ru.chayka.minesweeper.eventsystem.senders.view.MvcNewLeaderDtoEventSender;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class RecordNewLeaderFrame
-        implements RecordNewLeaderEventListener {
+        implements MvcRecordNewLeaderEventListener {
     private static final Logger log = LoggerFactory.getLogger(RecordNewLeaderFrame.class.getName());
 
     private final JDialog jDialog;
@@ -24,7 +24,7 @@ public class RecordNewLeaderFrame
 
     private final String defaultLeaderName = "Anon";
 
-    private final NewLeaderDtoEventSender newLeaderDtoEventSender;
+    private final MvcNewLeaderDtoEventSender mvcNewLeaderDtoEventSender;
 
     public RecordNewLeaderFrame(JFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -34,12 +34,12 @@ public class RecordNewLeaderFrame
         textField = new JTextField();
         okButton = new JButton();
 
-        newLeaderDtoEventSender = new NewLeaderDtoEventSender();
+        mvcNewLeaderDtoEventSender = new MvcNewLeaderDtoEventSender();
 
         okButton.addActionListener(event -> {
             if (!textField.getText().isBlank()) {
-                newLeaderDtoEventSender.notifyAllListeners(
-                        new NewLeaderDtoEvent(textField.getText()));
+                mvcNewLeaderDtoEventSender.notifyAllListeners(
+                        new MvcNewLeaderDtoEvent(textField.getText()));
             }
         });
         okButton.addActionListener(event -> jDialog.setVisible(false));
@@ -47,13 +47,13 @@ public class RecordNewLeaderFrame
         assembleFrame();
     }
 
-    public NewLeaderDtoEventSender getNewLeaderDtoEventSender() {
-        return newLeaderDtoEventSender;
+    public MvcNewLeaderDtoEventSender getMvcNewLeaderDtoEventSender() {
+        return mvcNewLeaderDtoEventSender;
     }
 
     @Override
-    public void acceptEvent(RecordNewLeaderEvent event) {
-        EventSystemLogger.logEventAccepting(log, this, event);
+    public void acceptEvent(MvcRecordNewLeaderEvent event) {
+        MvcEventSystemLogger.logEventAccepting(log, this, event);
 
         newRecordLabel.formMessage(event.getDifficulty());
 

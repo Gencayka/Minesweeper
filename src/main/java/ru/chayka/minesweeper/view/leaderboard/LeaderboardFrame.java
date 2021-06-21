@@ -2,18 +2,18 @@ package ru.chayka.minesweeper.view.leaderboard;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.chayka.minesweeper.eventsystem.EventSystemLogger;
-import ru.chayka.minesweeper.eventsystem.events.model.LeaderboardDtoEvent;
-import ru.chayka.minesweeper.eventsystem.events.view.UnparameterizedButtonPressedEvent;
-import ru.chayka.minesweeper.eventsystem.listeners.view.LeaderboardDtoEventListener;
-import ru.chayka.minesweeper.eventsystem.senders.view.UnparameterizedButtonPressedEventSender;
+import ru.chayka.minesweeper.eventsystem.MvcEventSystemLogger;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcLeaderboardDtoEvent;
+import ru.chayka.minesweeper.eventsystem.events.view.MvcUnparameterizedButtonPressedEvent;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MvcLeaderboardDtoEventListener;
+import ru.chayka.minesweeper.eventsystem.senders.view.MvcUnparameterizedButtonPressedEventSender;
 import ru.chayka.minesweeper.view.UnparameterizedButton;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class LeaderboardFrame
-        implements LeaderboardDtoEventListener {
+        implements MvcLeaderboardDtoEventListener {
     private static final Logger log = LoggerFactory.getLogger(LeaderboardFrame.class.getName());
 
     private final JDialog jDialog;
@@ -24,7 +24,7 @@ public class LeaderboardFrame
     private final JButton resetResultsButton;
     private final JButton okButton;
 
-    private final UnparameterizedButtonPressedEventSender unparameterizedButtonPressedEventSender;
+    private final MvcUnparameterizedButtonPressedEventSender mvcUnparameterizedButtonPressedEventSender;
 
     public LeaderboardFrame(JFrame mainFrame) {
         this.mainFrame = mainFrame;
@@ -34,23 +34,23 @@ public class LeaderboardFrame
         resetResultsButton = new JButton();
         okButton = new JButton();
 
-        unparameterizedButtonPressedEventSender = new UnparameterizedButtonPressedEventSender();
+        mvcUnparameterizedButtonPressedEventSender = new MvcUnparameterizedButtonPressedEventSender();
 
         okButton.addActionListener(event -> jDialog.setVisible(false));
         resetResultsButton.addActionListener(event ->
-                unparameterizedButtonPressedEventSender.notifyAllListeners(
-                        new UnparameterizedButtonPressedEvent(UnparameterizedButton.RESET_HIGH_SCORES)));
+                mvcUnparameterizedButtonPressedEventSender.notifyAllListeners(
+                        new MvcUnparameterizedButtonPressedEvent(UnparameterizedButton.RESET_HIGH_SCORES)));
 
         assembleFrame();
     }
 
-    public UnparameterizedButtonPressedEventSender getUnparameterizedButtonPressedEventSender() {
-        return unparameterizedButtonPressedEventSender;
+    public MvcUnparameterizedButtonPressedEventSender getMvcUnparameterizedButtonPressedEventSender() {
+        return mvcUnparameterizedButtonPressedEventSender;
     }
 
     @Override
-    public void acceptEvent(LeaderboardDtoEvent event) {
-        EventSystemLogger.logEventAccepting(log, this, event);
+    public void acceptEvent(MvcLeaderboardDtoEvent event) {
+        MvcEventSystemLogger.logEventAccepting(log, this, event);
 
         leaderboardPanel.updateLeaderboard(
                 event.getStrDifficultyModes(),

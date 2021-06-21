@@ -2,12 +2,17 @@ package ru.chayka.minesweeper.view.mainframe;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.chayka.minesweeper.eventsystem.events.view.MvcUnparameterizedButtonPressedEvent;
+import ru.chayka.minesweeper.eventsystem.senders.view.MvcUnparameterizedButtonPressedEventSender;
+import ru.chayka.minesweeper.view.UnparameterizedButton;
 import ru.chayka.minesweeper.view.mainframe.menu.GameMenuBar;
 import ru.chayka.minesweeper.view.mainframe.minefield.MinefieldPanel;
 import ru.chayka.minesweeper.view.mainframe.otherelements.OtherElementsPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MainFrame {
     private static final Logger log = LoggerFactory.getLogger(MainFrame.class.getName());
@@ -18,11 +23,23 @@ public class MainFrame {
     private final OtherElementsPanel otherElementsPanel;
     private final MinefieldPanel minefieldPanel;
 
+    private final MvcUnparameterizedButtonPressedEventSender mvcUnparameterizedButtonPressedEventSender;
+
     public MainFrame() {
         jFrame = new JFrame();
         gameMenuBar = new GameMenuBar();
         otherElementsPanel = new OtherElementsPanel();
         minefieldPanel = new MinefieldPanel();
+
+        mvcUnparameterizedButtonPressedEventSender = new MvcUnparameterizedButtonPressedEventSender();
+
+        jFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                mvcUnparameterizedButtonPressedEventSender.notifyAllListeners(
+                        new MvcUnparameterizedButtonPressedEvent(UnparameterizedButton.EXIT));
+            }
+        });
 
         assembleFrame();
     }
@@ -39,6 +56,10 @@ public class MainFrame {
         return minefieldPanel;
     }
 
+    public MvcUnparameterizedButtonPressedEventSender getMvcUnparameterizedButtonPressedEventSender() {
+        return mvcUnparameterizedButtonPressedEventSender;
+    }
+
     public JFrame getJFrame() {
         return jFrame;
     }
@@ -48,7 +69,6 @@ public class MainFrame {
         jFrame.setLayout(new GridBagLayout());
         jFrame.setLocationRelativeTo(null);
         jFrame.setResizable(false);
-        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         GridBagConstraints menuConstraints = new GridBagConstraints();
         menuConstraints.gridy = 0;

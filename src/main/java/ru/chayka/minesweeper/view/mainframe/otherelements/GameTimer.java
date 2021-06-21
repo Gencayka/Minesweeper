@@ -2,15 +2,15 @@ package ru.chayka.minesweeper.view.mainframe.otherelements;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.chayka.minesweeper.eventsystem.EventSystemLogger;
-import ru.chayka.minesweeper.eventsystem.events.model.GameTimeDtoEvent;
-import ru.chayka.minesweeper.eventsystem.listeners.view.GameTimeDtoEventListener;
+import ru.chayka.minesweeper.eventsystem.MvcEventSystemLogger;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcGameTimeDtoEvent;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MvcGameTimeDtoEventListener;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class GameTimer
-        implements GameTimeDtoEventListener {
+        implements MvcGameTimeDtoEventListener {
     private static final Logger log = LoggerFactory.getLogger(GameTimer.class.getName());
 
     private final JLabel jLabel;
@@ -27,8 +27,8 @@ public class GameTimer
     }
 
     @Override
-    public void acceptEvent(GameTimeDtoEvent event) {
-        EventSystemLogger.logEventAccepting(log, this, event);
+    public void acceptEvent(MvcGameTimeDtoEvent event) {
+        MvcEventSystemLogger.logEventAccepting(log, this, event);
         jLabel.setText(Integer.toString(event.getGameTime()));
     }
 }

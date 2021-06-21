@@ -1,30 +1,30 @@
 package ru.chayka.minesweeper.view.mainframe.menu;
 
-import ru.chayka.minesweeper.eventsystem.events.view.DifficultyModeButtonPressedEvent;
-import ru.chayka.minesweeper.eventsystem.senders.view.DifficultyModeButtonPressedEventSender;
+import ru.chayka.minesweeper.eventsystem.events.view.MvcDifficultyModeButtonPressedEvent;
+import ru.chayka.minesweeper.eventsystem.senders.view.MvcDifficultyModeButtonPressedEventSender;
 
 import javax.swing.*;
 
 public class SetDifficultyMenuButton {
     private final JRadioButtonMenuItem jRadioButtonMenuItem;
 
-    private final DifficultyModeButtonPressedEventSender difficultyModeButtonPressedEventSender;
+    private final MvcDifficultyModeButtonPressedEventSender mvcDifficultyModeButtonPressedEventSender;
 
     public SetDifficultyMenuButton(String text) {
         jRadioButtonMenuItem = new JRadioButtonMenuItem(text);
 
-        difficultyModeButtonPressedEventSender = new DifficultyModeButtonPressedEventSender();
+        mvcDifficultyModeButtonPressedEventSender = new MvcDifficultyModeButtonPressedEventSender();
 
         jRadioButtonMenuItem.addActionListener(event ->
-                difficultyModeButtonPressedEventSender.notifyAllListeners(
-                        new DifficultyModeButtonPressedEvent(jRadioButtonMenuItem.getText())));
+                mvcDifficultyModeButtonPressedEventSender.notifyAllListeners(
+                        new MvcDifficultyModeButtonPressedEvent(jRadioButtonMenuItem.getText())));
     }
 
     public JRadioButtonMenuItem getJRadioButtonMenuItem() {
         return jRadioButtonMenuItem;
     }
 
-    public DifficultyModeButtonPressedEventSender getDifficultyModeButtonPressedEventSender() {
-        return difficultyModeButtonPressedEventSender;
+    public MvcDifficultyModeButtonPressedEventSender getDifficultyModeButtonPressedEventSender() {
+        return mvcDifficultyModeButtonPressedEventSender;
     }
 }

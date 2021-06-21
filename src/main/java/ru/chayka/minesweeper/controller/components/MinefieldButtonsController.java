@@ -2,15 +2,15 @@ package ru.chayka.minesweeper.controller.components;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.chayka.minesweeper.eventsystem.EventSystemLogger;
-import ru.chayka.minesweeper.eventsystem.events.view.MinefieldButtonPressedEvent;
-import ru.chayka.minesweeper.eventsystem.listeners.controller.MinefieldButtonPressedEventListener;
+import ru.chayka.minesweeper.eventsystem.MvcEventSystemLogger;
+import ru.chayka.minesweeper.eventsystem.events.view.MvcMinefieldButtonPressedEvent;
+import ru.chayka.minesweeper.eventsystem.listeners.controller.MvcMinefieldButtonPressedEventListener;
 import ru.chayka.minesweeper.model.MinesweeperModel;
 import ru.chayka.minesweeper.model.minefield.MinefieldActionPerformer;
 import ru.chayka.minesweeper.view.mainframe.minefield.minefieldbutton.MinefieldButtonState;
 
 public class MinefieldButtonsController
-        implements MinefieldButtonPressedEventListener {
+        implements MvcMinefieldButtonPressedEventListener {
     private static final Logger log = LoggerFactory.getLogger(MinefieldButtonsController.class.getName());
 
     private final MinefieldActionPerformer model;
@@ -20,8 +20,8 @@ public class MinefieldButtonsController
     }
 
     @Override
-    public void acceptEvent(MinefieldButtonPressedEvent event) {
-        EventSystemLogger.logEventAccepting(log, this, event);
+    public void acceptEvent(MvcMinefieldButtonPressedEvent event) {
+        MvcEventSystemLogger.logEventAccepting(log, this, event);
 
         switch (event.getMouseButton()) {
             case RMB:

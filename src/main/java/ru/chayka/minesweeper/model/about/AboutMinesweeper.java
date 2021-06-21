@@ -1,22 +1,22 @@
 package ru.chayka.minesweeper.model.about;
 
-import ru.chayka.minesweeper.eventsystem.events.model.AboutDtoEvent;
-import ru.chayka.minesweeper.eventsystem.senders.model.AboutDtoEventSender;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcAboutDtoEvent;
+import ru.chayka.minesweeper.eventsystem.senders.model.MvcAboutDtoEventSender;
 
 public class AboutMinesweeper {
-    private final AboutDtoEventSender aboutDtoEventSender;
+    private final MvcAboutDtoEventSender mvcAboutDtoEventSender;
 
     private final String text = "Here could be your advertising";
 
     public AboutMinesweeper() {
-        aboutDtoEventSender = new AboutDtoEventSender();
+        mvcAboutDtoEventSender = new MvcAboutDtoEventSender();
     }
 
-    public AboutDtoEventSender getAboutDtoEventSender() {
-        return aboutDtoEventSender;
+    public MvcAboutDtoEventSender getMvcAboutDtoEventSender() {
+        return mvcAboutDtoEventSender;
     }
 
     public void sendAboutTextToView() {
-        aboutDtoEventSender.notifyAllListeners(new AboutDtoEvent(text));
+        mvcAboutDtoEventSender.notifyAllListeners(new MvcAboutDtoEvent(text));
     }
 }

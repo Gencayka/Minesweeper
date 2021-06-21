@@ -1,16 +1,22 @@
 package ru.chayka.minesweeper.model.minefield;
 
-import ru.chayka.minesweeper.eventsystem.events.model.MinefieldDtoEvent;
-import ru.chayka.minesweeper.eventsystem.senders.model.MinefieldDtoEventSender;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcMinefieldDtoEvent;
+import ru.chayka.minesweeper.eventsystem.senders.model.MvcMinefieldDtoEventSender;
 import ru.chayka.minesweeper.model.DifficultyMode;
+import ru.chayka.minesweeper.model.eventsystem.events.MinefieldDtoEvent;
+import ru.chayka.minesweeper.model.eventsystem.senders.MinefieldDtoEventSender;
 
 public class MinefieldCreator {
     private DifficultyMode lastDifficultyMode;
 
     private final MinefieldDtoEventSender minefieldDtoEventSender;
 
+    private final MvcMinefieldDtoEventSender mvcMinefieldDtoEventSender;
+
     public MinefieldCreator() {
         minefieldDtoEventSender = new MinefieldDtoEventSender();
+
+        mvcMinefieldDtoEventSender = new MvcMinefieldDtoEventSender();
     }
 
     public DifficultyMode getLastDifficultyMode() {
@@ -21,14 +27,19 @@ public class MinefieldCreator {
         return minefieldDtoEventSender;
     }
 
-    public Minefield createNewMinefield(DifficultyMode difficultyMode) {
+    public MvcMinefieldDtoEventSender getMvcMinefieldDtoEventSender() {
+        return mvcMinefieldDtoEventSender;
+    }
+
+    public void createNewMinefield(DifficultyMode difficultyMode) {
         lastDifficultyMode = difficultyMode;
         Minefield minefield = new Minefield(difficultyMode, generateClearField(difficultyMode.numOfRows, difficultyMode.numOfColumns));
         setAdjacentCells(minefield, difficultyMode.numOfRows, difficultyMode.numOfColumns);
 
         minefieldDtoEventSender.notifyAllListeners(
-                new MinefieldDtoEvent(difficultyMode.numOfRows, difficultyMode.numOfColumns));
-        return minefield;
+                new MinefieldDtoEvent(minefield));
+        mvcMinefieldDtoEventSender.notifyAllListeners(
+                new MvcMinefieldDtoEvent(difficultyMode.numOfRows, difficultyMode.numOfColumns));
     }
 
     private MinefieldCell[][] generateClearField(int numOfRows, int numOfColumns) {

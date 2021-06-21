@@ -1,28 +1,40 @@
 package ru.chayka.minesweeper.model.leaderboard;
 
-import ru.chayka.minesweeper.eventsystem.events.model.LeaderboardDtoEvent;
-import ru.chayka.minesweeper.eventsystem.events.model.RecordNewLeaderEvent;
-import ru.chayka.minesweeper.eventsystem.senders.model.LeaderboardDtoEventSender;
-import ru.chayka.minesweeper.eventsystem.senders.model.RecordNewLeaderEventSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcLeaderboardDtoEvent;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcRecordNewLeaderEvent;
+import ru.chayka.minesweeper.eventsystem.senders.model.MvcLeaderboardDtoEventSender;
+import ru.chayka.minesweeper.eventsystem.senders.model.MvcRecordNewLeaderEventSender;
 import ru.chayka.minesweeper.model.DifficultyMode;
+import ru.chayka.minesweeper.model.eventsystem.EventSystemLogger;
+import ru.chayka.minesweeper.model.eventsystem.events.GameOverEvent;
+import ru.chayka.minesweeper.model.eventsystem.listeners.GameOverEventListener;
+import ru.chayka.minesweeper.model.timer.GameTimer;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class Leaderboard {
+public class Leaderboard
+        implements GameOverEventListener {
+    private static final Logger log = LoggerFactory.getLogger(Leaderboard.class.getName());
+
+    private final GameTimer gameTimer;
+
     private ArrayList<LeaderEntry> leaderEntries;
     private LeaderEntry bufferEntry;
 
     public static final String XML_FILE_NAME = "./leaderboard.xml";
 
-    private final LeaderboardDtoEventSender leaderboardDtoEventSender;
-    private final RecordNewLeaderEventSender recordNewLeaderEventSender;
+    private final MvcLeaderboardDtoEventSender mvcLeaderboardDtoEventSender;
+    private final MvcRecordNewLeaderEventSender mvcRecordNewLeaderEventSender;
 
-    public Leaderboard() {
+    public Leaderboard(GameTimer gameTimer) {
+        this.gameTimer = gameTimer;
+
         leaderEntries = new ArrayList<>();
-
         bufferEntry = new LeaderEntry();
 
         if (Files.exists(Paths.get(XML_FILE_NAME))) {
@@ -38,8 +50,8 @@ public class Leaderboard {
             createNewLeaderboard();
         }
 
-        leaderboardDtoEventSender = new LeaderboardDtoEventSender();
-        recordNewLeaderEventSender = new RecordNewLeaderEventSender();
+        mvcLeaderboardDtoEventSender = new MvcLeaderboardDtoEventSender();
+        mvcRecordNewLeaderEventSender = new MvcRecordNewLeaderEventSender();
     }
 
     public ArrayList<LeaderEntry> getLeaderEntries() {
@@ -50,12 +62,12 @@ public class Leaderboard {
         this.leaderEntries = leaderEntries;
     }
 
-    public LeaderboardDtoEventSender getLeaderboardDtoEventSender() {
-        return leaderboardDtoEventSender;
+    public MvcLeaderboardDtoEventSender getMvcLeaderboardDtoEventSender() {
+        return mvcLeaderboardDtoEventSender;
     }
 
-    public RecordNewLeaderEventSender getRecordNewLeaderEventSender() {
-        return recordNewLeaderEventSender;
+    public MvcRecordNewLeaderEventSender getMvcRecordNewLeaderEventSender() {
+        return mvcRecordNewLeaderEventSender;
     }
 
     public void createNewLeaderboard() {
@@ -71,31 +83,6 @@ public class Leaderboard {
         sendLeaderboardEntriesToView();
     }
 
-    private boolean checkLeaderboardFileConformity() {
-        if (DifficultyMode.values().length == leaderEntries.size()) {
-            for (int i = 0; i < leaderEntries.size(); i++) {
-                if (!leaderEntries.get(i).getStrDifficultyMode().equals(
-                        DifficultyMode.values()[i].toString())) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public void tryToRecordNewLeader(DifficultyMode difficultyMode, int time) {
-        for (LeaderEntry leaderEntry : leaderEntries) {
-            if (leaderEntry.getStrDifficultyMode().equals(difficultyMode.toString()) &&
-                    leaderEntry.getTime() > time) {
-                bufferEntry = new LeaderEntry(difficultyMode, time);
-                recordNewLeaderEventSender.notifyAllListeners(
-                        new RecordNewLeaderEvent(difficultyMode.toString()));
-            }
-        }
-    }
-
     public void recordNewLeader(String leaderName) {
         for (LeaderEntry leaderEntry : leaderEntries) {
             if (bufferEntry.getStrDifficultyMode().equals(leaderEntry.getStrDifficultyMode())) {
@@ -108,6 +95,39 @@ public class Leaderboard {
     }
 
     public void sendLeaderboardEntriesToView() {
-        leaderboardDtoEventSender.notifyAllListeners(new LeaderboardDtoEvent(this));
+        mvcLeaderboardDtoEventSender.notifyAllListeners(new MvcLeaderboardDtoEvent(this));
+    }
+
+    @Override
+    public void acceptEvent(GameOverEvent event) {
+        EventSystemLogger.logEventAccepting(log, this, event);
+        if (event.isWon()) {
+            tryToRecordNewLeader(event.getDifficultyMode());
+        }
+    }
+
+    private void tryToRecordNewLeader(DifficultyMode difficultyMode) {
+        for (LeaderEntry leaderEntry : leaderEntries) {
+            if (leaderEntry.getStrDifficultyMode().equals(difficultyMode.toString()) &&
+                    leaderEntry.getTime() > gameTimer.getGameTime()) {
+                bufferEntry = new LeaderEntry(difficultyMode, gameTimer.getGameTime());
+                mvcRecordNewLeaderEventSender.notifyAllListeners(
+                        new MvcRecordNewLeaderEvent(difficultyMode.toString()));
+            }
+        }
+    }
+
+    private boolean checkLeaderboardFileConformity() {
+        if (DifficultyMode.values().length == leaderEntries.size()) {
+            for (int i = 0; i < leaderEntries.size(); i++) {
+                if (!leaderEntries.get(i).getStrDifficultyMode().equals(
+                        DifficultyMode.values()[i].toString())) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -2,15 +2,15 @@ package ru.chayka.minesweeper.view.aboutframe;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.chayka.minesweeper.eventsystem.EventSystemLogger;
-import ru.chayka.minesweeper.eventsystem.events.model.AboutDtoEvent;
-import ru.chayka.minesweeper.eventsystem.listeners.view.AboutDtoEventListener;
+import ru.chayka.minesweeper.eventsystem.MvcEventSystemLogger;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcAboutDtoEvent;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MvcAboutDtoEventListener;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class AboutFrame
-        implements AboutDtoEventListener {
+        implements MvcAboutDtoEventListener {
     private static final Logger log = LoggerFactory.getLogger(AboutFrame.class.getName());
 
     private final JDialog jDialog;
@@ -32,8 +32,8 @@ public class AboutFrame
     }
 
     @Override
-    public void acceptEvent(AboutDtoEvent event) {
-        EventSystemLogger.logEventAccepting(log, this, event);
+    public void acceptEvent(MvcAboutDtoEvent event) {
+        MvcEventSystemLogger.logEventAccepting(log, this, event);
 
         aboutLabel.setText(event.getText());
 

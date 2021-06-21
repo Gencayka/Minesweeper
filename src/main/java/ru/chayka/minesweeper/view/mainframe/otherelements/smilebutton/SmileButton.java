@@ -2,33 +2,33 @@ package ru.chayka.minesweeper.view.mainframe.otherelements.smilebutton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.chayka.minesweeper.eventsystem.EventSystemLogger;
-import ru.chayka.minesweeper.eventsystem.events.model.GameOverEvent;
-import ru.chayka.minesweeper.eventsystem.events.model.MinefieldDtoEvent;
-import ru.chayka.minesweeper.eventsystem.events.view.UnparameterizedButtonPressedEvent;
-import ru.chayka.minesweeper.eventsystem.listeners.view.GameOverEventListener;
-import ru.chayka.minesweeper.eventsystem.listeners.view.MinefieldDtoEventListener;
-import ru.chayka.minesweeper.eventsystem.senders.view.UnparameterizedButtonPressedEventSender;
+import ru.chayka.minesweeper.eventsystem.MvcEventSystemLogger;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcGameOverEvent;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcMinefieldDtoEvent;
+import ru.chayka.minesweeper.eventsystem.events.view.MvcUnparameterizedButtonPressedEvent;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MvcGameOverEventListener;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MvcMinefieldDtoEventListener;
+import ru.chayka.minesweeper.eventsystem.senders.view.MvcUnparameterizedButtonPressedEventSender;
 import ru.chayka.minesweeper.view.UnparameterizedButton;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class SmileButton
-        implements GameOverEventListener, MinefieldDtoEventListener {
+        implements MvcGameOverEventListener, MvcMinefieldDtoEventListener {
     private static final Logger log = LoggerFactory.getLogger(SmileButton.class.getName());
 
     private final JButton jButton;
 
-    private final UnparameterizedButtonPressedEventSender unparameterizedButtonPressedEventSender;
+    private final MvcUnparameterizedButtonPressedEventSender mvcUnparameterizedButtonPressedEventSender;
 
     public SmileButton() {
         jButton = new JButton();
-        unparameterizedButtonPressedEventSender = new UnparameterizedButtonPressedEventSender();
+        mvcUnparameterizedButtonPressedEventSender = new MvcUnparameterizedButtonPressedEventSender();
 
         jButton.addActionListener(event ->
-                unparameterizedButtonPressedEventSender.notifyAllListeners(
-                        new UnparameterizedButtonPressedEvent(UnparameterizedButton.SMILE)));
+                mvcUnparameterizedButtonPressedEventSender.notifyAllListeners(
+                        new MvcUnparameterizedButtonPressedEvent(UnparameterizedButton.SMILE)));
         jButton.addActionListener(event -> setState(SmileButtonState.DEFAULT));
 
         jButton.setPreferredSize(new Dimension(26, 26));
@@ -43,17 +43,17 @@ public class SmileButton
         return jButton;
     }
 
+    public MvcUnparameterizedButtonPressedEventSender getMvcUnparameterizedButtonPressedEventSender() {
+        return mvcUnparameterizedButtonPressedEventSender;
+    }
+
     public void setState(SmileButtonState state) {
         jButton.setIcon(state.icon);
     }
 
-    public UnparameterizedButtonPressedEventSender getUnparameterizedButtonPressedEventSender() {
-        return unparameterizedButtonPressedEventSender;
-    }
-
     @Override
-    public void acceptEvent(GameOverEvent event) {
-        EventSystemLogger.logEventAccepting(log, this, event);
+    public void acceptEvent(MvcGameOverEvent event) {
+        MvcEventSystemLogger.logEventAccepting(log, this, event);
         if (event.isWon()) {
             setState(SmileButtonState.COOL);
         } else {
@@ -62,8 +62,8 @@ public class SmileButton
     }
 
     @Override
-    public void acceptEvent(MinefieldDtoEvent event) {
-        EventSystemLogger.logEventAccepting(log, this, event);
+    public void acceptEvent(MvcMinefieldDtoEvent event) {
+        MvcEventSystemLogger.logEventAccepting(log, this, event);
         setState(SmileButtonState.DEFAULT);
     }
 }

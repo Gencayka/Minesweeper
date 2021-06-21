@@ -2,11 +2,11 @@ package ru.chayka.minesweeper.view.mainframe.menu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.chayka.minesweeper.eventsystem.EventSystemLogger;
-import ru.chayka.minesweeper.eventsystem.events.model.DifficultyModesDtoEvent;
-import ru.chayka.minesweeper.eventsystem.events.view.UnparameterizedButtonPressedEvent;
-import ru.chayka.minesweeper.eventsystem.listeners.view.DifficultyModesDtoEventListener;
-import ru.chayka.minesweeper.eventsystem.senders.view.UnparameterizedButtonPressedEventSender;
+import ru.chayka.minesweeper.eventsystem.MvcEventSystemLogger;
+import ru.chayka.minesweeper.eventsystem.events.model.MvcDifficultyModesDtoEvent;
+import ru.chayka.minesweeper.eventsystem.events.view.MvcUnparameterizedButtonPressedEvent;
+import ru.chayka.minesweeper.eventsystem.listeners.view.MvcDifficultyModesDtoEventListener;
+import ru.chayka.minesweeper.eventsystem.senders.view.MvcUnparameterizedButtonPressedEventSender;
 import ru.chayka.minesweeper.view.UnparameterizedButton;
 
 import javax.swing.*;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameMenu
-        implements DifficultyModesDtoEventListener {
+        implements MvcDifficultyModesDtoEventListener {
     private static final Logger log = LoggerFactory.getLogger(GameMenu.class.getName());
 
     private final JMenu jMenu;
@@ -24,7 +24,7 @@ public class GameMenu
     private final JMenuItem highScoresMenuButton;
     private final JMenuItem exitButton;
 
-    private final UnparameterizedButtonPressedEventSender unparameterizedButtonPressedEventSender;
+    private final MvcUnparameterizedButtonPressedEventSender mvcUnparameterizedButtonPressedEventSender;
 
     public GameMenu() {
         jMenu = new JMenu();
@@ -33,17 +33,17 @@ public class GameMenu
         highScoresMenuButton = new JMenuItem();
         exitButton = new JMenuItem();
 
-        unparameterizedButtonPressedEventSender = new UnparameterizedButtonPressedEventSender();
+        mvcUnparameterizedButtonPressedEventSender = new MvcUnparameterizedButtonPressedEventSender();
 
         newGameButton.addActionListener(event ->
-                unparameterizedButtonPressedEventSender.notifyAllListeners(
-                        new UnparameterizedButtonPressedEvent(UnparameterizedButton.NEW_GAME)));
+                mvcUnparameterizedButtonPressedEventSender.notifyAllListeners(
+                        new MvcUnparameterizedButtonPressedEvent(UnparameterizedButton.NEW_GAME)));
         highScoresMenuButton.addActionListener(event ->
-                unparameterizedButtonPressedEventSender.notifyAllListeners(
-                        new UnparameterizedButtonPressedEvent(UnparameterizedButton.HIGH_SCORES)));
+                mvcUnparameterizedButtonPressedEventSender.notifyAllListeners(
+                        new MvcUnparameterizedButtonPressedEvent(UnparameterizedButton.HIGH_SCORES)));
         exitButton.addActionListener(event ->
-                unparameterizedButtonPressedEventSender.notifyAllListeners(
-                        new UnparameterizedButtonPressedEvent(UnparameterizedButton.EXIT)));
+                mvcUnparameterizedButtonPressedEventSender.notifyAllListeners(
+                        new MvcUnparameterizedButtonPressedEvent(UnparameterizedButton.EXIT)));
     }
 
     public JMenu getJMenu() {
@@ -54,13 +54,13 @@ public class GameMenu
         return setDifficultyMenuButtons;
     }
 
-    public UnparameterizedButtonPressedEventSender getUnparameterizedButtonPressedEventSender() {
-        return unparameterizedButtonPressedEventSender;
+    public MvcUnparameterizedButtonPressedEventSender getMvcUnparameterizedButtonPressedEventSender() {
+        return mvcUnparameterizedButtonPressedEventSender;
     }
 
     @Override
-    public void acceptEvent(DifficultyModesDtoEvent event) {
-        EventSystemLogger.logEventAccepting(log, this, event);
+    public void acceptEvent(MvcDifficultyModesDtoEvent event) {
+        MvcEventSystemLogger.logEventAccepting(log, this, event);
         assembleMenu(event.getNames(), event.getInitDifficultyModelIndex());
     }
 
