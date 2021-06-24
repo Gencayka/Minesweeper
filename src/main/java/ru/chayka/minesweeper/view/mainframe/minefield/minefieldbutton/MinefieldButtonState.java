@@ -28,7 +28,7 @@ public enum MinefieldButtonState {
     final ImageIcon icon;
     final ImageIcon pressedIcon;
 
-    MinefieldButtonState(String imageName) throws ExceptionInInitializerError {
+    MinefieldButtonState(String imageName) {
         ImageIcon icon = new ImageIcon(this.getClass().getResource("/Images/" + imageName));
         if (icon.getImageLoadStatus() != MediaTracker.COMPLETE) {
             log.error("Couldn't upload image " + imageName);

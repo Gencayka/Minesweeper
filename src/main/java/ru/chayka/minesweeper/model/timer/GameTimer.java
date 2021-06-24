@@ -11,6 +11,7 @@ import ru.chayka.minesweeper.model.eventsystem.events.MinefieldDtoEvent;
 import ru.chayka.minesweeper.model.eventsystem.listeners.FirstCellOpeningEventListener;
 import ru.chayka.minesweeper.model.eventsystem.listeners.GameOverEventListener;
 import ru.chayka.minesweeper.model.eventsystem.listeners.MinefieldDtoEventListener;
+import ru.chayka.minesweeper.model.settings.Settings;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -22,7 +23,6 @@ public class GameTimer
     private Timer timer;
     private int gameTime;
     private long initTime;
-    public static final int GAME_TIME_MAX = 999;
 
     private final MvcGameTimeDtoEventSender mvcGameTimeDtoEventSender;
 
@@ -84,7 +84,7 @@ public class GameTimer
     private class GameTimerTask extends TimerTask {
         @Override
         public void run() {
-            if (gameTime < GAME_TIME_MAX) {
+            if (gameTime < Settings.getInstance().getGameTimeMax()) {
                 //к времени прибаляется 1, т.к. в оригинальном сапере отсчет времени
                 // начинался с 1, а не с 0
                 gameTime = Math.toIntExact((System.currentTimeMillis() - initTime) / 1000) + 1;

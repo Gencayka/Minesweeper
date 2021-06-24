@@ -10,6 +10,7 @@ import ru.chayka.minesweeper.model.DifficultyMode;
 import ru.chayka.minesweeper.model.eventsystem.EventSystemLogger;
 import ru.chayka.minesweeper.model.eventsystem.events.GameOverEvent;
 import ru.chayka.minesweeper.model.eventsystem.listeners.GameOverEventListener;
+import ru.chayka.minesweeper.model.settings.Settings;
 import ru.chayka.minesweeper.model.timer.GameTimer;
 
 import java.io.IOException;
@@ -26,8 +27,6 @@ public class Leaderboard
     private ArrayList<LeaderEntry> leaderEntries;
     private LeaderEntry bufferEntry;
 
-    public static final String XML_FILE_NAME = "./leaderboard.xml";
-
     private final MvcLeaderboardDtoEventSender mvcLeaderboardDtoEventSender;
     private final MvcRecordNewLeaderEventSender mvcRecordNewLeaderEventSender;
 
@@ -37,7 +36,7 @@ public class Leaderboard
         leaderEntries = new ArrayList<>();
         bufferEntry = new LeaderEntry();
 
-        if (Files.exists(Paths.get(XML_FILE_NAME))) {
+        if (Files.exists(Paths.get(Settings.getInstance().getLeaderboardXmlFileName()))) {
             try {
                 LeaderBoardXMLDao.deserializeFromXML(this);
                 if (!checkLeaderboardFileConformity()) {

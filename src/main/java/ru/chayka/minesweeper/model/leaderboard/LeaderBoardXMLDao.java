@@ -2,6 +2,7 @@ package ru.chayka.minesweeper.model.leaderboard;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.chayka.minesweeper.model.settings.Settings;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -16,7 +17,7 @@ public class LeaderBoardXMLDao {
 
     public static void serializeToXML(Leaderboard leaderboard) {
         try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
-                new FileOutputStream(Leaderboard.XML_FILE_NAME)))) {
+                new FileOutputStream(Settings.getInstance().getLeaderboardXmlFileName())))) {
             encoder.writeObject(leaderboard.getLeaderEntries());
         } catch (IOException io) {
             log.error("Failed to open file");
@@ -26,7 +27,7 @@ public class LeaderBoardXMLDao {
 
     public static void deserializeFromXML(Leaderboard leaderboard) throws IOException {
         try (XMLDecoder decoder = new XMLDecoder(
-                new FileInputStream(Leaderboard.XML_FILE_NAME))) {
+                new FileInputStream(Settings.getInstance().getLeaderboardXmlFileName()))) {
             leaderboard.setLeaderEntries((ArrayList<LeaderEntry>) decoder.readObject());
         } catch (IOException io) {
             log.error("Failed to open file");

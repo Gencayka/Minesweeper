@@ -7,6 +7,7 @@ import ru.chayka.minesweeper.eventsystem.events.model.MvcRecordNewLeaderEvent;
 import ru.chayka.minesweeper.eventsystem.events.view.MvcNewLeaderDtoEvent;
 import ru.chayka.minesweeper.eventsystem.listeners.view.MvcRecordNewLeaderEventListener;
 import ru.chayka.minesweeper.eventsystem.senders.view.MvcNewLeaderDtoEventSender;
+import ru.chayka.minesweeper.view.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,8 +22,6 @@ public class RecordNewLeaderFrame
     private final NewRecordLabel newRecordLabel;
     private final JTextField textField;
     private final JButton okButton;
-
-    private final String defaultLeaderName = "Anon";
 
     private final MvcNewLeaderDtoEventSender mvcNewLeaderDtoEventSender;
 
@@ -71,7 +70,7 @@ public class RecordNewLeaderFrame
         labelPanel.add(newRecordLabel.getJLabel());
         jDialog.add(labelPanel, gridBagConstraints);
 
-        textField.setText(defaultLeaderName);
+        textField.setText(Settings.getInstance().getDefaultLeaderName());
         gridBagConstraints.gridy = 1;
         textField.setPreferredSize(new Dimension(150, 18));
         JPanel textFieldPanel = new JPanel();

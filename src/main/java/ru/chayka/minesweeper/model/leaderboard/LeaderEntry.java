@@ -1,12 +1,9 @@
 package ru.chayka.minesweeper.model.leaderboard;
 
 import ru.chayka.minesweeper.model.DifficultyMode;
-import ru.chayka.minesweeper.model.timer.GameTimer;
+import ru.chayka.minesweeper.model.settings.Settings;
 
 public class LeaderEntry {
-    private final static int DEFAULT_TIME = GameTimer.GAME_TIME_MAX;
-    private final static String DEFAULT_LEADER_NAME = "Leeroy Jenkins";
-
     private String strDifficultyMode;
     private int time;
     private String leaderName;
@@ -21,11 +18,11 @@ public class LeaderEntry {
     }
 
     public LeaderEntry(DifficultyMode difficultyMode) {
-        this(difficultyMode, DEFAULT_TIME, DEFAULT_LEADER_NAME);
+        this(difficultyMode, Settings.getInstance().getGameTimeMax(), Settings.getInstance().getDefaultLeaderName());
     }
 
     public LeaderEntry(DifficultyMode difficultyMode, int time) {
-        this(difficultyMode, time, DEFAULT_LEADER_NAME);
+        this(difficultyMode, time, Settings.getInstance().getDefaultLeaderName());
     }
 
     public String getStrDifficultyMode() {
